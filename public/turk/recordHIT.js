@@ -10,15 +10,14 @@ Wami.RecordHIT = new function() {
 	var _prompts_recorded = 0;
 	var _heard_last = false;
 
-	var _script = latestScript();
-	//var _script_loc = _script.src.replace(/[^\/]*\.js$/, "");
+	var _script = getLatestScript();
 
 	this.create = function(prompts, baseurl) {
-		_maindiv = document.createElement("center");
-		_script.parentNode.insertBefore(_maindiv, _script);
-		_session_id = createSessionID();
 		_baseurl = getBaseURL(baseurl);
 		_prompts = prompts;
+		_session_id = createSessionID();
+		_maindiv = document.createElement("center");
+		_script.parentNode.insertBefore(_maindiv, _script);
 
 		injectCSS(_baseurl + "turk/recordHIT.css")
 		var swfobjecturl = "https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js";
@@ -30,15 +29,21 @@ Wami.RecordHIT = new function() {
 				});
 			});
 		});
+
 		return _session_id;
 	}
 	    
+        function getLatestScript() {
+	    var scripts = document.getElementsByTagName('script');
+	    return scripts[scripts.length - 1];
+	}
+
 	// Get the full URL directory structure:
 	//
 	// http://url/client
 	// http://url/audio
 	// http://url/turk
-        function getBaseURL(baseurl) {
+	function getBaseURL(script, baseurl) {
 	    if (!baseurl) {
 		baseurl = _script.src.replace(/[^\/]*\.js$/, "");
 		baseurl = (baseurl === "") ? document.location.href : baseurl;
@@ -48,6 +53,7 @@ Wami.RecordHIT = new function() {
 	    if (baseurl.indexOf("/", baseurl.length - 1) == -1) {
 		baseurl += "/";
 	    }
+
 	    return baseurl;
 	}
 
@@ -95,11 +101,6 @@ Wami.RecordHIT = new function() {
 		var div = document.createElement("div");
 		div.setAttribute('id', id);
 		return div;
-	}
-
-	function latestScript() {
-		var scripts = document.getElementsByTagName('script');
-		return scripts[scripts.length - 1];
 	}
 
 	function embedWami() {
@@ -157,7 +158,7 @@ Wami.RecordHIT = new function() {
 	}
 
 	function getServerURL() {
-		return _baseurl + "audio/?name=" + _session_id + "-" + _prompt_index;
+		return _baseurl + "audio?name=" + _session_id + "-" + _prompt_index;
 	}
 
 	function startRecording() {
