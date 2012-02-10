@@ -11,32 +11,44 @@ Wami.RecordHIT = new function() {
 	var _heard_last = false;
 
 	var _script = latestScript();
-	var _script_loc = _script.src.replace(/\/[^\/]*\.js$/, '/');
+	//var _script_loc = _script.src.replace(/[^\/]*\.js$/, "");
 
 	this.create = function(prompts, baseurl) {
 		_maindiv = document.createElement("center");
 		_script.parentNode.insertBefore(_maindiv, _script);
 		_session_id = createSessionID();
-		if (!baseurl) {
-			baseurl = "";
-		} else if (baseurl.indexOf("/", baseurl.length - 1) == 1) {
-			baseurl += "/";
-		}
-
+		_baseurl = getBaseURL(baseurl);
 		_prompts = prompts;
-		_baseurl = baseurl;
 
-		injectCSS(_script_loc + "recordHIT.css")
+		injectCSS(_baseurl + "turk/recordHIT.css")
 		var swfobjecturl = "https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js";
 		getScript(swfobjecturl, function() {
-			getScript(baseurl + "recorder.js", function() {
-				getScript(baseurl + "gui.js", function() {
+			getScript(_baseurl + "client/recorder.js", function() {
+				getScript(_baseurl + "client/gui.js", function() {
 					embedWami();
 					setupPrompts();
 				});
 			});
 		});
 		return _session_id;
+	}
+	    
+	// Get the full URL directory structure:
+	//
+	// http://url/client
+	// http://url/audio
+	// http://url/turk
+        function getBaseURL(baseurl) {
+	    if (!baseurl) {
+		baseurl = _script.src.replace(/[^\/]*\.js$/, "");
+		baseurl = (baseurl === "") ? document.location.href : baseurl;
+		baseurl = baseurl.replace("turk/", "");
+	    }
+
+	    if (baseurl.indexOf("/", baseurl.length - 1) == -1) {
+		baseurl += "/";
+	    }
+	    return baseurl;
 	}
 
 	function injectCSS(url) {
@@ -101,24 +113,25 @@ Wami.RecordHIT = new function() {
 		wrapperDiv.appendChild(wamiDiv);
 		_maindiv.appendChild(wrapperDiv);
 
-		Wami.setup(Wami.RecordHIT.checkSecurity, "wami", _baseurl + "Wami.swf");
+		Wami.setup(Wami.RecordHIT.checkSecurity, "wami", _baseurl + "client/Wami.swf");
 	}
 
 	var recordButton, playButton;
 	var recordInterval, playInterval;
 
 	function setupButtons() {
-		recordButton = new Wami.Button("recordDiv", Wami.Button.RECORD,
-				_baseurl + "buttons.png");
-		recordButton.onstart = startRecording;
-		recordButton.onstop = stopRecording;
-		recordButton.setEnabled(true);
-
-		playButton = new Wami.Button("playDiv", Wami.Button.PLAY, _baseurl
-				+ "buttons.png");
-		playButton.onstart = startPlaying;
-		playButton.onstop = stopPlaying;
-		playButton.setEnabled(false);
+	    var buttonsurl = _baseurl + "client/buttons.png";
+	    recordButton = new Wami.Button("recordDiv", Wami.Button.RECORD,
+					   buttonsurl);
+	    recordButton.onstart = startRecording;
+	    recordButton.onstop = stopRecording;
+	    recordButton.setEnabled(true);
+	    
+	    playButton = new Wami.Button("playDiv", Wami.Button.PLAY, 
+					 buttonsurl);
+	    playButton.onstart = startPlaying;
+	    playButton.onstop = stopPlaying;
+	    playButton.setEnabled(false);
 	}
 
 	this.checkSecurity = function() {
@@ -144,8 +157,7 @@ Wami.RecordHIT = new function() {
 	}
 
 	function getServerURL() {
-		return "https://wami-recorder.appspot.com/?name=" + _session_id + "-"
-				+ _prompt_index;
+		return _baseurl + "audio/?name=" + _session_id + "-" + _prompt_index;
 	}
 
 	function startRecording() {

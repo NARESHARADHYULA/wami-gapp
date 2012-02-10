@@ -7,12 +7,17 @@ handlers:
 - url: /crossdomain.xml
   mime_type: text/xml
   static_files: crossdomain.xml
-  upload: crossdomain.xml
+  upload: public/crossdomain.xml
 
 - url: /list
-  script: list.py
+  script: python/list.py
   login: admin
 
-- url: .*
-  script: sessions.py
+- url: /audio
+  script: python/sessions.py
 
+- url: /client
+  static_dir: public/client
+
+- url: /turk
+  static_dir: public/turk

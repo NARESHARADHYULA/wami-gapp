@@ -72,6 +72,10 @@
 	playButton.setEnabled(false);
     }
 
+    function getServerURL() {
+        return document.location.href.replace(/\/[^\/]*\/[^\/]*\.html$/, '/') + "audio";
+    }
+
     /**
      * These methods are called on clicks from the GUI.
      */
@@ -79,7 +83,7 @@
     function startRecording() {
 	recordButton.setActivity(0);
 	playButton.setEnabled(false);
-	Wami.startRecording("https://wami-recorder.appspot.com/", "onRecordStart", "onRecordFinish", "onError");
+	Wami.startRecording(getServerURL(), "onRecordStart", "onRecordFinish", "onError");
     }
 
     function stopRecording() {
@@ -91,7 +95,7 @@
     function startPlaying() {
 	playButton.setActivity(0);
 	recordButton.setEnabled(false);
-	Wami.startPlaying("https://wami-recorder.appspot.com/", "onPlayStart", "onPlayFinish", "onError");
+	Wami.startPlaying(getServerURL(), "onPlayStart", "onPlayFinish", "onError");
     }
 
     function stopPlaying() {
