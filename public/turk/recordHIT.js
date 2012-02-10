@@ -66,7 +66,22 @@ Wami.RecordHIT = new function() {
 	    hidden.value = _session_id;
 	    div.appendChild(hidden);
 	    
+	    window.onload = function() {
+		document.getElementById('submitButton').setAttribute('onclick', 'return Wami.RecordHIT.validate()'); 
+	    }
 	    return div;
+	}
+
+	this.validate = function() {
+	    function validateForm() {
+		if (_prompts_recorded == _prompts.length) {
+		    return true;
+		}
+		else {
+		    setInstructions("You have not finished recording AND replaying all the audio!", "error");
+		    return false;
+		}
+	    }
 	}
 
 	function injectCSS(url) {
@@ -336,11 +351,13 @@ Wami.RecordHIT = new function() {
 		}
 	}
 
-	function setInstructions(instructions) {
+	function setInstructions(instructions, className) {
 		showelement("InstructionsDiv");
 		var instructionsDiv = document.getElementById("InstructionsDiv");
-		instructionsDiv.className = (instructionsDiv.className == "one") ? "two"
-				: "one";
+		if (!className) {
+		    className = (instructionsDiv.className == "one") ? "two" : "one";
+		}
+		instructionsDiv.className = className ;
 		instructionsDiv.innerHTML = instructions;
 	}
 

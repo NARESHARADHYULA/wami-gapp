@@ -36,6 +36,10 @@ div {
 	color: blue; 
 }
 
+#InstructionsDiv.error {
+	color: red; 
+}
+
 #TaskDiv {	
 	font-size: 22px;
 }
