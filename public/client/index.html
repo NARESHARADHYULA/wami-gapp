@@ -72,8 +72,13 @@
 	playButton.setEnabled(false);
     }
 
-    function getServerURL() {
+    function getRecordURL() {
+        // Replace this with the location of your server that captures audio.
         return document.location.href.replace(/\/[^\/]*\/[^\/]*\.html$/, '/') + "audio";
+    }
+
+    function getPlayURL() {
+        return getRecordURL();   // In this case, they are the same.
     }
 
     /**
@@ -83,7 +88,7 @@
     function startRecording() {
 	recordButton.setActivity(0);
 	playButton.setEnabled(false);
-	Wami.startRecording(getServerURL(), "onRecordStart", "onRecordFinish", "onError");
+	Wami.startRecording(getRecordURL(), "onRecordStart", "onRecordFinish", "onError");
     }
 
     function stopRecording() {
@@ -95,7 +100,7 @@
     function startPlaying() {
 	playButton.setActivity(0);
 	recordButton.setEnabled(false);
-	Wami.startPlaying(getServerURL(), "onPlayStart", "onPlayFinish", "onError");
+	Wami.startPlaying(getPlayURL(), "onPlayStart", "onPlayFinish", "onError");
     }
 
     function stopPlaying() {

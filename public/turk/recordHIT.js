@@ -16,8 +16,7 @@ Wami.RecordHIT = new function() {
 		_baseurl = getBaseURL(baseurl);
 		_prompts = prompts;
 		_session_id = createSessionID();
-		_maindiv = document.createElement("center");
-		_script.parentNode.insertBefore(_maindiv, _script);
+		_maindiv = createMainDiv();
 
 		injectCSS(_baseurl + "turk/recordHIT.css")
 		var swfobjecturl = "https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js";
@@ -25,7 +24,6 @@ Wami.RecordHIT = new function() {
 			getScript(_baseurl + "client/recorder.js", function() {
 				getScript(_baseurl + "client/gui.js", function() {
 					embedWami();
-					setupPrompts();
 				});
 			});
 		});
@@ -55,6 +53,20 @@ Wami.RecordHIT = new function() {
 	    }
 
 	    return baseurl;
+	}
+
+	function createMainDiv() {
+	    var div = document.createElement("center");
+	    _script.parentNode.insertBefore(div, _script);
+	    
+	    // Set the element that will get
+	    var hidden = document.createElement("input");
+	    hidden.type = "hidden";
+	    hidden.id = hidden.name = "session_id";
+	    hidden.value = _session_id;
+	    div.appendChild(hidden);
+	    
+	    return div;
 	}
 
 	function injectCSS(url) {
@@ -147,6 +159,7 @@ Wami.RecordHIT = new function() {
 			};
 			Wami.hide();
 			setupButtons();
+			setupPrompts();
 		} else {
 			Wami.showSecurity("privacy", "Wami.show",
 					"Wami.RecordHIT.checkSecurity", "Wami.RecordHIT.zoomError");

@@ -6,7 +6,7 @@ api_version: 1
 handlers:
 - url: /crossdomain.xml
   mime_type: text/xml
-  static_files: crossdomain.xml
+  static_files: public/crossdomain.xml
   upload: public/crossdomain.xml
 
 - url: /list
