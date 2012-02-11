@@ -55,32 +55,47 @@ Wami.RecordHIT = new function() {
 	    return baseurl;
 	}
 
+	function setResultField(name, value) {
+	    var form = document.getElementById('mturk_form');
+
+	    if (!form) {
+		alert("Expecting a form called 'mturk_form' that submits the HIT");
+	    }
+
+	    var previousField = document.getElementById(name);
+	    if (previousField) {
+		form.removeChild(previousField);
+	    }
+
+	    var hiddenE = document.createElement('input');
+	    hiddenE.setAttribute('type', 'hidden');
+	    hiddenE.setAttribute('name', name);
+	    hiddenE.setAttribute('id', name);
+	    hiddenE.setAttribute('value', value);
+	    form.appendChild(hiddenE);
+	}
+
 	function createMainDiv() {
 	    var div = document.createElement("center");
 	    _script.parentNode.insertBefore(div, _script);
-	    
-	    // Set the element that will get
-	    var hidden = document.createElement("input");
-	    hidden.type = "hidden";
-	    hidden.id = hidden.name = "session_id";
-	    hidden.value = _session_id;
-	    div.appendChild(hidden);
-	    
 	    window.onload = function() {
-		document.getElementById('submitButton').setAttribute('onclick', 'return Wami.RecordHIT.validate()'); 
+		var submitButton = document.getElementById('submitButton');
+		submitButton.setAttribute('onclick', 'return Wami.RecordHIT.validate()'); 
+		var parent = submitButton.parentNode;
+		if (parent && parent.nodeName === "P") {
+		    parent.style.textAlign = 'center';
+		}
 	    }
 	    return div;
 	}
 
 	this.validate = function() {
-	    function validateForm() {
-		if (_prompts_recorded == _prompts.length) {
-		    return true;
-		}
-		else {
-		    setInstructions("You have not finished recording AND replaying all the audio!", "error");
-		    return false;
-		}
+	    if (_prompts_recorded == _prompts.length && _heard_last) {
+		return true;
+	    }
+	    else {
+		setInstructions("You have not finished recording AND replaying all the audio!", "error");
+		return false;
 	    }
 	}
 
@@ -192,8 +207,10 @@ Wami.RecordHIT = new function() {
 	function startRecording() {
 		recordButton.setActivity(0);
 		playButton.setEnabled(false);
-		Wami.startRecording(getServerURL(), "Wami.RecordHIT.onRecordStart",
-				"Wami.RecordHIT.onRecordFinish", "Wami.RecordHIT.onError");
+		var url = getServerURL();
+		setResultField("url-" + _prompt_index, url);
+		Wami.startRecording(url, "Wami.RecordHIT.onRecordStart",
+				    "Wami.RecordHIT.onRecordFinish", "Wami.RecordHIT.onError");
 	}
 
 	function stopRecording() {
