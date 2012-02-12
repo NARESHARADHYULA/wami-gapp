@@ -17,6 +17,7 @@ Wami.RecordHIT = new function() {
 		_prompts = prompts;
 		_session_id = createSessionID();
 		_maindiv = createMainDiv();
+		showLoading(true);
 
 		injectCSS(_baseurl + "turk/recordHIT.css")
 		var swfobjecturl = "https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js";
@@ -45,6 +46,7 @@ Wami.RecordHIT = new function() {
 	    if (!baseurl) {
 		baseurl = _script.src.replace(/[^\/]*\.js$/, "");
 		baseurl = (baseurl === "") ? document.location.href : baseurl;
+		baseurl = baseurl.replace("index.html", "");
 		baseurl = baseurl.replace("turk/", "");
 	    }
 
@@ -75,12 +77,30 @@ Wami.RecordHIT = new function() {
 	    form.appendChild(hiddenE);
 	}
 
+	function showLoading(show) {
+	    if (show) {
+		var loading = document.createElement("img");
+		loading.src = _baseurl + "turk/loading.gif";
+		loading.setAttribute("id", "Loading");
+		_maindiv.appendChild(loading);
+	    }
+	    else {
+		var loading = document.getElementById("Loading");
+		_maindiv.removeChild(loading);
+	    }
+	}
+
 	function createMainDiv() {
-	    var div = document.createElement("center");
+	    var div = document.createElement("div");
 	    _script.parentNode.insertBefore(div, _script);
+
 	    window.onload = function() {
 		var submitButton = document.getElementById('submitButton');
-		submitButton.setAttribute('onclick', 'return Wami.RecordHIT.validate()'); 
+		if (submitButton.attachEvent) {
+		    submitButton.attachEvent('onclick', Wami.RecordHIT.validate); 
+		} else {
+		    submitButton.setAttribute('onclick', 'return Wami.RecordHIT.validate()'); 
+		}
 		var parent = submitButton.parentNode;
 		if (parent && parent.nodeName === "P") {
 		    parent.style.textAlign = 'center';
@@ -100,17 +120,12 @@ Wami.RecordHIT = new function() {
 	}
 
 	function injectCSS(url) {
-		var css = '@import url("' + url + '");';
-		var style = document.createElement('style');
-		var rules = document.createTextNode(css);
-
-		style.type = 'text/css';
-		if (style.styleSheet)
-			style.styleSheet.cssText = rules.nodeValue;
-		else
-			style.appendChild(rules);
-
-		document.body.appendChild(style);
+	    var cssNode = document.createElement('link');
+	    cssNode.type = 'text/css';
+	    cssNode.rel = 'stylesheet';
+	    cssNode.href = url;
+	    cssNode.media = 'screen';
+	    document.body.appendChild(cssNode);
 	}
 
 	function createSessionID() {
@@ -120,11 +135,21 @@ Wami.RecordHIT = new function() {
 	}
 
 	function getScript(url, cb) {
-		var newScript = document.createElement('script');
-		newScript.type = 'text/javascript';
-		newScript.src = url;
-		newScript.onload = cb;
-		document.body.appendChild(newScript);
+		var script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.src = url;
+		
+		var done = false;
+		script.onload = script.onreadystatechange = function() {
+		    if (!done && (!this.readyState ||
+				  this.readyState === "loaded" || this.readyState === "complete") ) {
+			done = true;
+			script.onload = script.onreadystatechange = null;
+			cb();
+		    }
+		};
+
+		document.body.appendChild(script);
 	}
 
 	function gup(name) {
@@ -132,7 +157,7 @@ Wami.RecordHIT = new function() {
 		var regex = new RegExp(regexS);
 		var tmpURL = window.location.href;
 		var results = regex.exec(tmpURL);
-		if (results == null) {
+		if (results) {
 			return null;
 		} else {
 			return results[1];
@@ -146,17 +171,20 @@ Wami.RecordHIT = new function() {
 	}
 
 	function embedWami() {
-		var wrapperDiv = createDiv("wrapper");
-		var recordDiv = createDiv("recordDiv");
-		var playDiv = createDiv("playDiv");
-		var wamiDiv = createDiv("wami");
+	    var wrapperDiv = createDiv("WamiWrapper");
+	    var wamiDiv = createDiv("WamiDiv");
+	    var recordDiv = createDiv("RecordButton");
+	    var playDiv = createDiv("PlayButton");
+	    var swfDiv = createDiv("wami");
 
-		wrapperDiv.appendChild(recordDiv);
-		wrapperDiv.appendChild(playDiv);
-		wrapperDiv.appendChild(wamiDiv);
-		_maindiv.appendChild(wrapperDiv);
-
-		Wami.setup(Wami.RecordHIT.checkSecurity, "wami", _baseurl + "client/Wami.swf");
+	    wamiDiv.appendChild(recordDiv);
+	    wamiDiv.appendChild(playDiv);
+	    wamiDiv.appendChild(swfDiv);
+	    wrapperDiv.appendChild(wamiDiv);
+	    _maindiv.appendChild(wrapperDiv);
+	    
+	    var swfurl = _baseurl + "client/Wami.swf";
+	    Wami.setup(Wami.RecordHIT.checkSecurity, "wami", swfurl);
 	}
 
 	var recordButton, playButton;
@@ -164,13 +192,13 @@ Wami.RecordHIT = new function() {
 
 	function setupButtons() {
 	    var buttonsurl = _baseurl + "client/buttons.png";
-	    recordButton = new Wami.Button("recordDiv", Wami.Button.RECORD,
+	    recordButton = new Wami.Button("RecordButton", Wami.Button.RECORD,
 					   buttonsurl);
 	    recordButton.onstart = startRecording;
 	    recordButton.onstop = stopRecording;
 	    recordButton.setEnabled(true);
 	    
-	    playButton = new Wami.Button("playDiv", Wami.Button.PLAY, 
+	    playButton = new Wami.Button("PlayButton", Wami.Button.PLAY, 
 					 buttonsurl);
 	    playButton.onstart = startPlaying;
 	    playButton.onstop = stopPlaying;
@@ -178,6 +206,7 @@ Wami.RecordHIT = new function() {
 	}
 
 	this.checkSecurity = function() {
+		showLoading(false);
 		var settings = Wami.getSettings();
 		if (settings.microphone.granted) {
 			Wami.startListening();
@@ -278,7 +307,7 @@ Wami.RecordHIT = new function() {
 	}
 
 	function createButton(id, value, callback) {
-		var button = document.createElement('div');
+		var button = document.createElement('span');
 		button.setAttribute('id', id);
 		button.className = "button orange";
 		button.innerHTML = value;
@@ -296,9 +325,12 @@ Wami.RecordHIT = new function() {
 		hidden.value = _session_id;
 		_maindiv.appendChild(hidden);
 
-		var hitdiv = createDiv("hitwrapper");
+		var hitdiv = createDiv("HitWrapper");
 		_maindiv.appendChild(hitdiv);
 
+		var spacerDiv = createDiv("SpacerDiv");
+		hitdiv.appendChild(spacerDiv);
+		
 		hitdiv.appendChild(createDiv("TaskDiv"));
 		hitdiv.appendChild(createDiv("InstructionsDiv"));
 		var readingDiv = createDiv("ReadingDiv");
@@ -315,7 +347,7 @@ Wami.RecordHIT = new function() {
 					updateView();
 				}));
 
-		buttonDiv.appendChild(createButton("NextTaskButton", "Next    ",
+		buttonDiv.appendChild(createButton("NextTaskButton", "Next",
 				function(enabled) {
 					if (enabled)
 						_prompt_index++;
@@ -329,7 +361,6 @@ Wami.RecordHIT = new function() {
 
 	function showelement(id) {
 		// safe function to show an element with a specified id
-
 		if (document.getElementById) { // DOM3 = IE5, NS6
 			var e = document.getElementById(id);
 			if (e) {
@@ -403,11 +434,9 @@ Wami.RecordHIT = new function() {
 		var prevButton = document.getElementById("PrevTaskButton");
 		var nextButton = document.getElementById("NextTaskButton");
 
-		prevButton.disabled = !enablePrevious;
 		prevButton.className = "button "
 				+ (enablePrevious ? 'blue enabled' : 'gray disabled');
 
-		nextButton.disabled = !enableNext;
 		nextButton.className = "button "
 				+ (enableNext ? 'blue enabled' : 'gray disabled');
 

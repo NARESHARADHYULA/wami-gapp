@@ -168,7 +168,6 @@ Wami.setup = function(callback, id, swfurl) {
 
 		// If we already have permissions, they were previously 'remembered'
 		Wami._remembered = recorder.getSettings().microphone.granted;
-
 		callback();
 	}
 

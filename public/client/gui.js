@@ -75,8 +75,6 @@ Wami.Button = function(guiID, type, url) {
 		}
 
 		var div = document.createElement("div");
-		div.style.position = 'relative';
-
 		var elem = document.getElementById(guiID);
 		if (elem) {
 			elem.appendChild(div);
