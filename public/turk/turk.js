@@ -1,5 +1,29 @@
-function BrowserDetect() {
-    this.dataBrowser = [
+var Wami = window.Wami || {};
+
+Wami.Turk = {};
+
+Wami.Turk.setResultField = function(name, value) {
+    var form = document.getElementById('mturk_form');
+
+    if (!form) {
+	alert("Expecting a form called 'mturk_form' that submits the HIT");
+    }
+    
+    var previousField = document.getElementById(name);
+    if (previousField) {
+	form.removeChild(previousField);
+    }
+    
+    var hiddenE = document.createElement('input');
+    hiddenE.setAttribute('type', 'hidden');
+    hiddenE.setAttribute('name', name);
+    hiddenE.setAttribute('id', name);
+    hiddenE.setAttribute('value', value);
+    form.appendChild(hiddenE);
+}
+
+Wami.Turk.BrowserDetect = function() {
+    var dataBrowser = [
 			{
 			    string: navigator.userAgent,
 			    subString: "Chrome",
@@ -64,8 +88,8 @@ function BrowserDetect() {
 			    identity: "Netscape",
 			    versionSearch: "Mozilla"
 			}
-			],
-	this.dataOS = [
+		       ];
+     var dataOS = [
 		       {
 			   string: navigator.platform,
 			   subString: "Win",
@@ -108,9 +132,9 @@ function BrowserDetect() {
 	return parseFloat(dataString.substring(index+this.versionSearchString.length+1));
     }
     
-    this.browser = searchString(this.dataBrowser) || "An unknown browser";
+    this.browser = searchString(dataBrowser) || "An unknown browser";
     this.version = searchVersion(navigator.userAgent)
 	|| searchVersion(navigator.appVersion)
 	|| "an unknown version";
-    this.OS = searchString(this.dataOS) || "an unknown OS";
+    this.OS = searchString(dataOS) || "an unknown OS";
 }

@@ -22,7 +22,7 @@ Wami.RecordHIT = new function() {
 		injectCSS(_baseurl + "turk/recordHIT.css")
 		var swfobjecturl = "https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js";
 		getScript(swfobjecturl, function() {
-			getScript(_baseurl + "turk/browser.js", function() {
+			getScript(_baseurl + "turk/turk.js", function() {
 				getScript(_baseurl + "client/recorder.js", function() {
 					getScript(_baseurl + "client/gui.js", function() {
 						embedWami();
@@ -36,7 +36,7 @@ Wami.RecordHIT = new function() {
 	}
 
         function logPlatformDetails() {
-	    var bd = new BrowserDetect();
+	    var bd = new Wami.Turk.BrowserDetect();
 	    var browserInfo = bd.OS + " : " +bd.browser + " " + bd.version;
 	    var fp = Wami.swfobject.getFlashPlayerVersion();
 	    var flashInfo = "None";
@@ -44,8 +44,8 @@ Wami.RecordHIT = new function() {
 		var flashInfo = "Flash Player " + fp.major + "." + fp.minor + "." + fp.release;
 	    }
 
-	    setResultField("platform", browserInfo);
-	    setResultField("flash", flashInfo);
+	    Wami.Turk.setResultField("platform", browserInfo);
+	    Wami.Turk.setResultField("flash", flashInfo);
 	}
 	    
         function getLatestScript() {
@@ -71,26 +71,6 @@ Wami.RecordHIT = new function() {
 	    }
 
 	    return baseurl;
-	}
-
-	function setResultField(name, value) {
-	    var form = document.getElementById('mturk_form');
-
-	    if (!form) {
-		alert("Expecting a form called 'mturk_form' that submits the HIT");
-	    }
-
-	    var previousField = document.getElementById(name);
-	    if (previousField) {
-		form.removeChild(previousField);
-	    }
-
-	    var hiddenE = document.createElement('input');
-	    hiddenE.setAttribute('type', 'hidden');
-	    hiddenE.setAttribute('name', name);
-	    hiddenE.setAttribute('id', name);
-	    hiddenE.setAttribute('value', value);
-	    form.appendChild(hiddenE);
 	}
 
 	function createMainDiv() {
@@ -355,7 +335,7 @@ Wami.RecordHIT = new function() {
 		}
 
 		var url = getServerURL();
-		setResultField("url-" + _prompt_index, url);
+		Wami.Turk.setResultField("url-" + _prompt_index, url);
 		_gui.setRecordUrl(url);
 		_gui.setPlayUrl(url);
 

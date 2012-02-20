@@ -4,11 +4,18 @@
 <form id="mturk_form" method="POST" action="https://www.mturk.com/mturk/externalSubmit">
 
 
-<!--
-If you do not know (or care to know) about Amazon Mechanical Turk,
-you can delete this directory.  For those that want to collect audio
-cheaply via the crowd-sourcing, this is a relatively easy method.
+<!-- If you do not know (or care to know) about Amazon Mechanical
+Turk, you can delete this directory.  For those that want to collect
+audio cheaply via the crowd-sourcing, this is a relatively easy
+method.  Just use the "Edit HTML" portion of AMT's web-interface and
+copy the code between the lines into the HIT and change the
+"recordHIT.js" to the full path of where you are hosting it.
 -->
+
+
+
+
+<!------------------------------------------------------------------>
 
 <script src="recordHIT.js"></script>
 <p><input type="hidden" id="wsession" /></p>
@@ -17,6 +24,13 @@ cheaply via the crowd-sourcing, this is a relatively easy method.
  document.getElementById('wsession').value = Wami.RecordHIT.create(prompts);
 </script>
 <noscript>You do not have JavaScript.  Please do not submit.</noscript>
+
+
+<!------------------------------------------------------------------>
+
+
+
+
 
 <p><input type="button" id="submitButton" value="Submit" /></p>
 </form>
