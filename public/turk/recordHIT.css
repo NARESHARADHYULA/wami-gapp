@@ -9,7 +9,9 @@ div {
 
 #WamiWrapper {
 	position: absolute;
-	width: 90%;
+	width: 100%;
+	left:0px; 
+	right:0px; 
 }
 
 #WamiDiv {
@@ -20,6 +22,12 @@ div {
 
 #SpacerDiv {
 	height: 100px;
+}
+
+#submitButton {
+	display: none;
+	margin: 0px auto;
+	width: 100px;
 }
 
 #RecordButton {

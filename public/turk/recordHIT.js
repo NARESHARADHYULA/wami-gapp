@@ -96,19 +96,6 @@ Wami.RecordHIT = new function() {
 	function createMainDiv() {
 	    var div = document.createElement("div");
 	    _script.parentNode.insertBefore(div, _script);
-
-	    window.onload = function() {
-		var submitButton = document.getElementById('submitButton');
-		if (submitButton.attachEvent) {
-		    submitButton.attachEvent('onclick', Wami.RecordHIT.validate); 
-		} else {
-		    submitButton.setAttribute('onclick', 'return Wami.RecordHIT.validate()'); 
-		}
-		var parent = submitButton.parentNode;
-		if (parent && parent.nodeName === "P") {
-		    parent.style.textAlign = 'center';
-		}
-	    }
 	    return div;
 	}
 
@@ -180,13 +167,13 @@ Wami.RecordHIT = new function() {
 	    wrapperDiv.appendChild(wamiDiv);
 	    _maindiv.appendChild(wrapperDiv);
 
-	    //showLoading(true);
+	    showLoading(true);
 	    Wami.setup({
     	        id : 'WamiDiv',
 		swfUrl : _baseurl + "client/Wami.swf",
 		loadingUrl : _baseurl + "turk/loading.gif",
 		onLoaded : function() {
-			//	showLoading(false);
+			showLoading(false);
    	        },
 		onReady : setupGUI
    	    });
@@ -201,6 +188,21 @@ Wami.RecordHIT = new function() {
 	    });
 
 	    setupPrompts();
+	    setupSubmit();
+	}
+
+	function setupSubmit() {
+		var submitButton = document.getElementById('submitButton');
+		if (submitButton.attachEvent) {
+		    submitButton.attachEvent('onclick', Wami.RecordHIT.validate); 
+		} else {
+		    submitButton.setAttribute('onclick', 'return Wami.RecordHIT.validate()'); 
+		}
+		var parent = submitButton.parentNode;
+		if (parent && parent.nodeName === "P") {
+		    parent.style.textAlign = 'center';
+		}
+		showelement('submitButton');
 	}
 
 	function showLoading(show) {
@@ -290,7 +292,6 @@ Wami.RecordHIT = new function() {
 				}));
 
 		hitdiv.appendChild(buttonDiv);
-
 		updateView();
 	}
 
@@ -380,9 +381,7 @@ Wami.RecordHIT = new function() {
 		nextButton.className = "button "
 				+ (enableNext ? 'blue enabled' : 'gray disabled');
 
-		if (playButton) {
-			playButton.setEnabled(enableReplay);
-		}
+		_gui.setPlayEnabled(enableReplay);
 
 		showelement("ReadingDiv");
 		showelement("TaskDiv");
