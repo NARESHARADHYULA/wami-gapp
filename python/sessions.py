@@ -32,7 +32,7 @@ class WamiHandler(webapp.RequestHandler):
 
     def post(self):
         type = self.request.headers['Content-Type']
-        blob_file_name = files.blobstore.create(mime_type=type)
+        blob_file_name = files.blobstore.create(mime_type=type, _blobinfo_uploaded_filename=self.get_name())
         with files.open(blob_file_name, 'a') as f:
             f.write(self.request.body)
         f.close()

@@ -9,10 +9,6 @@ handlers:
   static_files: public/crossdomain.xml
   upload: public/crossdomain.xml
 
-- url: /list
-  script: python/list.py
-  login: admin
-
 - url: /audio
   script: python/sessions.py
 

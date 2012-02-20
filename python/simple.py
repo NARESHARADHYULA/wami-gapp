@@ -26,7 +26,7 @@ class WamiHandler(webapp.RequestHandler):
                      " bytes of type " + WamiHandler.type);
 
 def main():
-    application = webapp.WSGIApplication([('/', WamiHandler)],
+    application = webapp.WSGIApplication([('/audio', WamiHandler)],
                                          debug=True)
     util.run_wsgi_app(application)
 

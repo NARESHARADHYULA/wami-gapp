@@ -11,25 +11,41 @@ Wami.RecordHIT = new function() {
 	var _heard_last = false;
 
 	var _script = getLatestScript();
+	var _gui;
 
 	this.create = function(prompts, baseurl) {
 		_baseurl = getBaseURL(baseurl);
 		_prompts = prompts;
 		_session_id = createSessionID();
 		_maindiv = createMainDiv();
-		showLoading(true);
 
 		injectCSS(_baseurl + "turk/recordHIT.css")
 		var swfobjecturl = "https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js";
 		getScript(swfobjecturl, function() {
-			getScript(_baseurl + "client/recorder.js", function() {
-				getScript(_baseurl + "client/gui.js", function() {
-					embedWami();
+			getScript(_baseurl + "turk/browser.js", function() {
+				getScript(_baseurl + "client/recorder.js", function() {
+					getScript(_baseurl + "client/gui.js", function() {
+						embedWami();
+						logPlatformDetails();
+			                });
 				});
 			});
 		});
 
 		return _session_id;
+	}
+
+        function logPlatformDetails() {
+	    var bd = new BrowserDetect();
+	    var browserInfo = bd.OS + " : " +bd.browser + " " + bd.version;
+	    var fp = Wami.swfobject.getFlashPlayerVersion();
+	    var flashInfo = "None";
+	    if (fp) {
+		var flashInfo = "Flash Player " + fp.major + "." + fp.minor + "." + fp.release;
+	    }
+
+	    setResultField("platform", browserInfo);
+	    setResultField("flash", flashInfo);
 	}
 	    
         function getLatestScript() {
@@ -75,19 +91,6 @@ Wami.RecordHIT = new function() {
 	    hiddenE.setAttribute('id', name);
 	    hiddenE.setAttribute('value', value);
 	    form.appendChild(hiddenE);
-	}
-
-	function showLoading(show) {
-	    if (show) {
-		var loading = document.createElement("img");
-		loading.src = _baseurl + "turk/loading.gif";
-		loading.setAttribute("id", "Loading");
-		_maindiv.appendChild(loading);
-	    }
-	    else {
-		var loading = document.getElementById("Loading");
-		_maindiv.removeChild(loading);
-	    }
 	}
 
 	function createMainDiv() {
@@ -173,123 +176,51 @@ Wami.RecordHIT = new function() {
 	function embedWami() {
 	    var wrapperDiv = createDiv("WamiWrapper");
 	    var wamiDiv = createDiv("WamiDiv");
-	    var recordDiv = createDiv("RecordButton");
-	    var playDiv = createDiv("PlayButton");
-	    var swfDiv = createDiv("wami");
 
-	    wamiDiv.appendChild(recordDiv);
-	    wamiDiv.appendChild(playDiv);
-	    wamiDiv.appendChild(swfDiv);
 	    wrapperDiv.appendChild(wamiDiv);
 	    _maindiv.appendChild(wrapperDiv);
-	    
-	    var swfurl = _baseurl + "client/Wami.swf";
-	    Wami.setup(Wami.RecordHIT.checkSecurity, "wami", swfurl);
+
+	    //showLoading(true);
+	    Wami.setup({
+    	        id : 'WamiDiv',
+		swfUrl : _baseurl + "client/Wami.swf",
+		loadingUrl : _baseurl + "turk/loading.gif",
+		onLoaded : function() {
+			//	showLoading(false);
+   	        },
+		onReady : setupGUI
+   	    });
 	}
 
-	var recordButton, playButton;
-	var recordInterval, playInterval;
+	function setupGUI() {
+	    _gui = new Wami.GUI({
+		    id : 'WamiDiv',
+		    buttonUrl : _baseurl + "client/buttons.png",
+		    onPlayStart : onPlayStart,
+		    onRecordFinish : onRecordFinish
+	    });
 
-	function setupButtons() {
-	    var buttonsurl = _baseurl + "client/buttons.png";
-	    recordButton = new Wami.Button("RecordButton", Wami.Button.RECORD,
-					   buttonsurl);
-	    recordButton.onstart = startRecording;
-	    recordButton.onstop = stopRecording;
-	    recordButton.setEnabled(true);
-	    
-	    playButton = new Wami.Button("PlayButton", Wami.Button.PLAY, 
-					 buttonsurl);
-	    playButton.onstart = startPlaying;
-	    playButton.onstop = stopPlaying;
-	    playButton.setEnabled(false);
+	    setupPrompts();
 	}
 
-	this.checkSecurity = function() {
-		showLoading(false);
-		var settings = Wami.getSettings();
-		if (settings.microphone.granted) {
-			Wami.startListening();
-			window.onfocus = function() {
-				Wami.startListening();
-			};
-			window.onblur = function() {
-				Wami.stopListening();
-			};
-			Wami.hide();
-			setupButtons();
-			setupPrompts();
-		} else {
-			Wami.showSecurity("privacy", "Wami.show",
-					"Wami.RecordHIT.checkSecurity", "Wami.RecordHIT.zoomError");
-		}
-	}
-
-	this.zoomError = function() {
-		alert("Your browser may be zoomed too far out to show the Flash security settings panel.  Zoom in, and refresh.");
+	function showLoading(show) {
+	    if (show) {
+		var loading = document.createElement("img");
+		loading.src = _baseurl + "turk/loading.gif";
+		loading.setAttribute("id", "Loading");
+		_maindiv.appendChild(loading);
+	    }
+	    else {
+		var loading = document.getElementById("Loading");
+		_maindiv.removeChild(loading);
+	    }
 	}
 
 	function getServerURL() {
 		return _baseurl + "audio?name=" + _session_id + "-" + _prompt_index;
 	}
 
-	function startRecording() {
-		recordButton.setActivity(0);
-		playButton.setEnabled(false);
-		var url = getServerURL();
-		setResultField("url-" + _prompt_index, url);
-		Wami.startRecording(url, "Wami.RecordHIT.onRecordStart",
-				    "Wami.RecordHIT.onRecordFinish", "Wami.RecordHIT.onError");
-	}
-
-	function stopRecording() {
-		Wami.stopRecording();
-		clearInterval(recordInterval);
-		recordButton.setEnabled(true);
-	}
-
-	function startPlaying() {
-		playButton.setActivity(0);
-		recordButton.setEnabled(false);
-		Wami.startPlaying(getServerURL(), "Wami.RecordHIT.onPlayStart",
-				"Wami.RecordHIT.onPlayFinish", "Wami.RecordHIT.onError");
-	}
-
-	function stopPlaying() {
-		Wami.stopPlaying();
-	}
-
-	this.onError = function(e) {
-		alert(e);
-	}
-
-	this.onRecordStart = function() {
-		recordInterval = setInterval(function() {
-			if (recordButton.isActive()) {
-				var level = Wami.getRecordingLevel();
-				recordButton.setActivity(level);
-			}
-		}, 200);
-	}
-
-	this.onRecordFinish = function() {
-		if (_prompt_index == _prompts_recorded) {
-			// If we're not re-recording
-			_prompts_recorded++;
-			_heard_last = false;
-		}
-		playButton.setEnabled(true);
-		updateView();
-	}
-
-	this.onPlayStart = function() {
-		playInterval = setInterval(function() {
-			if (playButton.isActive()) {
-				var level = Wami.getPlayingLevel();
-				playButton.setActivity(level);
-			}
-		}, 200);
-
+	function onPlayStart() {
 		if (_prompt_index == _prompts_recorded - 1) {
 			_heard_last = true;
 		}
@@ -300,10 +231,14 @@ Wami.RecordHIT = new function() {
 		}, 1000);
 	}
 
-	this.onPlayFinish = function() {
-		clearInterval(playInterval);
-		recordButton.setEnabled(true);
-		playButton.setEnabled(true);
+
+	function onRecordFinish() {
+		if (_prompt_index == _prompts_recorded) {
+			// If we're not re-recording
+			_prompts_recorded++;
+			_heard_last = false;
+		}
+		updateView();
 	}
 
 	function createButton(id, value, callback) {
@@ -418,6 +353,11 @@ Wami.RecordHIT = new function() {
 			return;
 		}
 
+		var url = getServerURL();
+		setResultField("url-" + _prompt_index, url);
+		_gui.setRecordUrl(url);
+		_gui.setPlayUrl(url);
+
 		var phraseSpan = document.getElementById("PhraseSpan");
 		phraseSpan.innerHTML = _prompts[_prompt_index];
 
@@ -464,4 +404,5 @@ Wami.RecordHIT = new function() {
 			}
 		}
 	}
-}
+    }
+    
