@@ -5,5 +5,10 @@
                author="Ian McGraw"
                author_email="wami-toolkit@csail.mit.edu"
                description="Google App Engine hosted Amazon Mechanical Turk task for audio collection.." />
+  <UserPref name="scroll" display_name="Display scrollbar" default_value="No" datatype="enum">
+    <EnumValue value="auto" display_value="Automatic"/>
+    <EnumValue value="no" display_value="No"/>
+    <EnumValue value="yes" display_value="Yes"/>
+  </UserPref>
   <Content type="url" href="https://wami-recorder.appspot.com/turk/index.html"/>
 </Module>
