@@ -258,7 +258,7 @@ Wami.RecordHIT = new function() {
 		if (p) {
 		    // prompts comes from URL not AMT var.
 		    p = decodeURIComponent(p.replace(/\+/g, " "));
-		    p = p.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+		    p = p.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 		    prompts = p;							
 		} else {
 		    prompts = "Example Prompt 1 <> Test Prompt 2 <> Sample Prompt 3";
