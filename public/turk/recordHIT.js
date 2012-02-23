@@ -15,7 +15,7 @@ Wami.RecordHIT = new function() {
 
 	this.create = function(prompts, baseurl) {
 		_baseurl = getBaseURL(baseurl);
-		_prompts = prompts;
+		_prompts = parsePrompts(prompts);
 		_session_id = createSessionID();
 		_maindiv = createMainDiv();
 
@@ -25,8 +25,10 @@ Wami.RecordHIT = new function() {
 			getScript(_baseurl + "turk/turk.js", function() {
 				getScript(_baseurl + "client/recorder.js", function() {
 					getScript(_baseurl + "client/gui.js", function() {
-						embedWami();
-						logPlatformDetails();
+						embedWami(function() {
+							setupGUI();
+						});
+						setupTurk();
 			                });
 				});
 			});
@@ -35,7 +37,21 @@ Wami.RecordHIT = new function() {
 		return _session_id;
 	}
 
-        function logPlatformDetails() {
+        function setupTurk() {
+	    var assnElem = document.getElementById("assignmentId");
+	    var submitButton = document.getElementById('submitButton');
+	    if (assnElem.value === "external") {
+		var assignmentId = gup("assignmentId");
+		console.log(assignmentId);
+		if (assignmentId == "ASSIGNMENT_ID_NOT_AVAILABLE") {
+		    submitButton.disabled = true;
+		    submitButton.value = "You must ACCEPT the HIT before you can submit the results.";
+		    submitButton.style.width = "350px";
+		} else {
+		    assnElem.value = assignmentId;
+		}
+	    }
+
 	    var bd = new Wami.Turk.BrowserDetect();
 	    var browserInfo = bd.OS + " : " +bd.browser + " " + bd.version;
 	    var fp = Wami.swfobject.getFlashPlayerVersion();
@@ -127,7 +143,7 @@ Wami.RecordHIT = new function() {
 		var regex = new RegExp(regexS);
 		var tmpURL = window.location.href;
 		var results = regex.exec(tmpURL);
-		if (results) {
+		if (!results) {
 			return null;
 		} else {
 			return results[1];
@@ -140,7 +156,7 @@ Wami.RecordHIT = new function() {
 		return div;
 	}
 
-	function embedWami() {
+	function embedWami(callback) {
 	    var wrapperDiv = createDiv("WamiWrapper");
 	    var wamiDiv = createDiv("WamiDiv");
 
@@ -155,7 +171,7 @@ Wami.RecordHIT = new function() {
 		onLoaded : function() {
 			showLoading(false);
    	        },
-		onReady : setupGUI
+		onReady : callback
    	    });
 	}
 
@@ -232,6 +248,23 @@ Wami.RecordHIT = new function() {
 			callback(button.className.indexOf("enabled") != -1);
 		}
 		return button;
+	}
+	
+	function parsePrompts(prompts) {
+	    var regex = new RegExp("[$][{](.*)[}]");
+	    var results = regex.exec(prompts);
+	    if (results) {
+		var p = gup(results[1]);
+		if (p) {
+		    // prompts comes from URL not AMT var.
+		    p = decodeURIComponent(p.replace(/\+/g, " "));
+		    p = p.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+		    prompts = p;							
+		} else {
+		    prompts = "Example Prompt 1 <> Test Prompt 2 <> Sample Prompt 3";
+		}
+	    }
+	    return prompts.split(/<>/);
 	}
 
 	function setupPrompts() {

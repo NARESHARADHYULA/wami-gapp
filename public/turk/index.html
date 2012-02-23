@@ -1,38 +1,39 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
 <body>
-<form id="mturk_form" method="POST" action="https://www.mturk.com/mturk/externalSubmit">
+<form id="mturk_form" method="POST" action="http://www.mturk.com/mturk/externalSubmit">
+<input type="hidden" id="assignmentId" name="assignmentId" value="external">
 
 
-<!-- If you do not know (or care to know) about Amazon Mechanical
-Turk, you can delete this directory.  For those that want to collect
-audio cheaply via the crowd-sourcing, this is a relatively easy
-method.  Just use the "Edit HTML" portion of AMT's web-interface and
-copy the code between the lines into the HIT and change the
-"recordHIT.js" to the full path of where you are hosting it.
+
+
+
+<!-- If using the Amazon Mechanical Turk web-interface, click "Edit
+HTML Source" button and replace their code with the code between
+the ------s below.  Change the "recordHIT.js" to the full path of
+where you are hosting it
+(e.g. https://NAME.appspot.com/turk/recordHIT.js)
 -->
 
 
 
-
 <!------------------------------------------------------------------>
-
 <script src="recordHIT.js"></script>
 <p><input type="hidden" id="wsession" /></p>
 <script>
- var prompts = [ "${utt-0}", "${utt-1}", "${utt-2}", "${utt-3}", "${utt-4}" ];
- document.getElementById('wsession').value = Wami.RecordHIT.create(prompts);
+  var wsessionid = Wami.RecordHIT.create("${prompts}");
+  document.getElementById('wsession').value = wsessionid;
 </script>
-<noscript>You do not have JavaScript.  Please do not submit.</noscript>
-
-
+<noscript>You do not have JavaScript.  Do not attempt this HIT.</noscript>
 <!------------------------------------------------------------------>
 
 
 
 
 
-<p><input type="button" id="submitButton" value="Submit" /></p>
+
+
+<p><input type="submit" id="submitButton" value="Submit" onclick="return Wami.RecordHIT.validate()" /></p>
 </form>
 </body>
 </html>
