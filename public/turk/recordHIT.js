@@ -42,7 +42,7 @@ Wami.RecordHIT = new function() {
 	    var submitButton = document.getElementById('submitButton');
 	    if (assnElem.value === "external") {
 		var assignmentId = gup("assignmentId");
-		console.log(assignmentId);
+
 		if (assignmentId == "ASSIGNMENT_ID_NOT_AVAILABLE") {
 		    submitButton.disabled = true;
 		    submitButton.value = "You must ACCEPT the HIT before you can submit the results.";
