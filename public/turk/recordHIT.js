@@ -19,7 +19,6 @@ Wami.RecordHIT = new function() {
 		_session_id = createSessionID();
 		_maindiv = createMainDiv();
 
-		injectCSS(_baseurl + "turk/recordHIT.css")
 		var swfobjecturl = "https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js";
 		getScript(swfobjecturl, function() {
 			getScript(_baseurl + "turk/turk.js", function() {
@@ -46,7 +45,7 @@ Wami.RecordHIT = new function() {
 		if (assignmentId == "ASSIGNMENT_ID_NOT_AVAILABLE") {
 		    submitButton.disabled = true;
 		    submitButton.value = "You must ACCEPT the HIT before you can submit the results.";
-		    submitButton.style.width = "350px";
+		    submitButton.style.width = "400px";
 		} else {
 		    assnElem.value = assignmentId;
 		}
