@@ -15,8 +15,8 @@ hosted paths (e.g. https://NAME.appspot.com/turk/recordHIT.js)
 -->
 
 <!------------------------------------------------------------------>
-<link rel=StyleSheet type="text/css" href="recordHIT.css" />
-<script src="recordHIT.js"></script>
+<style type="text/css">@import url(recordHIT.css);</style>
+<script type="text/javascript" src="recordHIT.js"></script>
 <p><input type="hidden" id="wsession" /></p>
 <script>
   var wsessionid = Wami.RecordHIT.create("${prompts}");
