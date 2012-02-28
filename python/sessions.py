@@ -25,6 +25,9 @@ class WamiHandler(webapp.RequestHandler):
         blob_info = blobstore.BlobInfo.get(model.blob.key())
         blob_reader = blobstore.BlobReader(model.blob.key())
         data = blob_reader.read()
+
+        # For replay to work in Chrome we must pretend like we accept ranges.
+        self.response.headers['Accept-Ranges'] = "bytes"
         self.response.headers['Content-Type'] = blob_info.content_type
         self.response.out.write(data);
         logging.info("server-to-client: " + str(len(data)) + 
