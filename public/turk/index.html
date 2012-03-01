@@ -1,9 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
 <body>
-<form id="mturk_form" method="POST" action="http://www.mturk.com/mturk/externalSubmit">
-<input type="hidden" id="assignmentId" name="assignmentId" value="external">
-
+<form id="mturk_form" method="POST">
+<input type="hidden" id="assignmentId" name="assignmentId" />
 
 
 
@@ -11,7 +10,9 @@
 <!-- If using the Amazon Mechanical Turk web-interface, click "Edit
 HTML Source" button and replace their code with the code between
 the ------s below.  Change the "recordHIT" urls below to their full
-hosted paths (e.g. https://NAME.appspot.com/turk/recordHIT.js)
+hosted paths (e.g. https://NAME.appspot.com/turk/recordHIT.js).  There
+is no need to change the external interface when using the
+ExternalQuestion.
 -->
 
 <!------------------------------------------------------------------>
@@ -27,11 +28,7 @@ hosted paths (e.g. https://NAME.appspot.com/turk/recordHIT.js)
 
 
 
-
-
-
-
-<p><input type="submit" id="submitButton" value="Submit" onclick="return Wami.RecordHIT.validate()" /></p>
+<p><input type="submit" id="submitButton" value="Submit" /></p>
 </form>
 </body>
 </html>

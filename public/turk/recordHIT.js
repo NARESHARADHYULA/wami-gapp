@@ -15,7 +15,6 @@ Wami.RecordHIT = new function() {
 
 	this.create = function(prompts, baseurl) {
 		_baseurl = getBaseURL(baseurl);
-		_prompts = parsePrompts(prompts);
 		_session_id = createSessionID();
 		_maindiv = createMainDiv();
 
@@ -25,42 +24,15 @@ Wami.RecordHIT = new function() {
 				getScript(_baseurl + "client/recorder.js", function() {
 					getScript(_baseurl + "client/gui.js", function() {
 						embedWami(function() {
+							_prompts = parsePrompts(prompts);
 							setupGUI();
 						});
-						setupTurk();
 			                });
 				});
 			});
 		});
 
 		return _session_id;
-	}
-
-        function setupTurk() {
-	    var assnElem = document.getElementById("assignmentId");
-	    var submitButton = document.getElementById('submitButton');
-	    if (assnElem.value === "external") {
-		var assignmentId = gup("assignmentId");
-
-		if (assignmentId == "ASSIGNMENT_ID_NOT_AVAILABLE") {
-		    submitButton.disabled = true;
-		    submitButton.value = "You must ACCEPT the HIT before you can submit the results.";
-		    submitButton.style.width = "400px";
-		} else {
-		    assnElem.value = assignmentId;
-		}
-	    }
-
-	    var bd = new Wami.Turk.BrowserDetect();
-	    var browserInfo = bd.OS + " : " +bd.browser + " " + bd.version;
-	    var fp = Wami.swfobject.getFlashPlayerVersion();
-	    var flashInfo = "None";
-	    if (fp) {
-		var flashInfo = "Flash Player " + fp.major + "." + fp.minor + "." + fp.release;
-	    }
-
-	    Wami.Turk.setResultField("platform", browserInfo);
-	    Wami.Turk.setResultField("flash", flashInfo);
 	}
 	    
         function getLatestScript() {
@@ -94,7 +66,7 @@ Wami.RecordHIT = new function() {
 	    return div;
 	}
 
-	this.validate = function() {
+	function validate() {
 	    if (_prompts_recorded == _prompts.length && _heard_last) {
 		return true;
 	    }
@@ -137,18 +109,6 @@ Wami.RecordHIT = new function() {
 		document.body.appendChild(script);
 	}
 
-	function gup(name) {
-		var regexS = "[\\?&]" + name + "=([^&#]*)";
-		var regex = new RegExp(regexS);
-		var tmpURL = window.location.href;
-		var results = regex.exec(tmpURL);
-		if (!results) {
-			return null;
-		} else {
-			return results[1];
-		}
-	}
-
 	function createDiv(id, style) {
 		var div = document.createElement("div");
 		div.setAttribute('id', id);
@@ -183,21 +143,7 @@ Wami.RecordHIT = new function() {
 	    });
 
 	    setupPrompts();
-	    setupSubmit();
-	}
-
-	function setupSubmit() {
-		var submitButton = document.getElementById('submitButton');
-		if (submitButton.attachEvent) {
-		    submitButton.attachEvent('onclick', Wami.RecordHIT.validate); 
-		} else {
-		    submitButton.setAttribute('onclick', 'return Wami.RecordHIT.validate()'); 
-		}
-		var parent = submitButton.parentNode;
-		if (parent && parent.nodeName === "P") {
-		    parent.style.textAlign = 'center';
-		}
-		showelement('submitButton');
+	    Turk.setup(validate);
 	}
 
 	function showLoading(show) {
@@ -253,7 +199,7 @@ Wami.RecordHIT = new function() {
 	    var regex = new RegExp("[$][{](.*)[}]");
 	    var results = regex.exec(prompts);
 	    if (results) {
-		var p = gup(results[1]);
+		var p = Turk.gup(results[1]);
 		if (p) {
 		    // prompts comes from URL not AMT var.
 		    p = decodeURIComponent(p.replace(/\+/g, " "));
@@ -307,48 +253,8 @@ Wami.RecordHIT = new function() {
 		updateView();
 	}
 
-	function showelement(id) {
-		// safe function to show an element with a specified id
-		if (document.getElementById) { // DOM3 = IE5, NS6
-			var e = document.getElementById(id);
-			if (e) {
-				e.style.display = 'block';
-			}
-		} else {
-			if (document.layers) { // Netscape 4
-				if (document.id) {
-					document.id.display = 'block';
-				}
-			} else { // IE 4
-				if (document.all.id) {
-					document.all.id.style.display = 'block';
-				}
-			}
-		}
-	}
-
-	function hideelement(id) {
-		// safe function to hide an element with a specified id
-		if (document.getElementById) { // DOM3 = IE5, NS6
-			var e = document.getElementById(id);
-			if (e) {
-				e.style.display = 'none';
-			}
-		} else {
-			if (document.layers) { // Netscape 4
-				if (document.id) {
-					document.id.display = 'none';
-				}
-			} else { // IE 4
-				if (document.all.id) {
-					document.all.id.style.display = 'none';
-				}
-			}
-		}
-	}
-
 	function setInstructions(instructions, className) {
-		showelement("InstructionsDiv");
+		Turk.show("InstructionsDiv");
 		var instructionsDiv = document.getElementById("InstructionsDiv");
 		if (!className) {
 		    className = (instructionsDiv.className == "one") ? "two" : "one";
@@ -360,14 +266,14 @@ Wami.RecordHIT = new function() {
 	function updateView() {
 		if (_prompt_index == _prompts.length) {
 			setInstructions("You have finished all the tasks in this HIT, you can now click 'submit'.");
-			hideelement("ReadingDiv");
-			hideelement("TaskDiv");
-			hideelement("ButtonsDiv");
+			Turk.hide("ReadingDiv");
+			Turk.hide("TaskDiv");
+			Turk.hide("ButtonsDiv");
 			return;
 		}
 
 		var url = getServerURL();
-		Wami.Turk.setResultField("url-" + _prompt_index, url);
+		Turk.setResultField("url-" + _prompt_index, url);
 		_gui.setRecordUrl(url);
 		_gui.setPlayUrl(url);
 
@@ -395,9 +301,9 @@ Wami.RecordHIT = new function() {
 
 		_gui.setPlayEnabled(enableReplay);
 
-		showelement("ReadingDiv");
-		showelement("TaskDiv");
-		showelement("ButtonsDiv");
+		Turk.show("ReadingDiv");
+		Turk.show("TaskDiv");
+		Turk.show("ButtonsDiv");
 
 		if (enableNext) {
 			if (_prompt_index == _prompts.length - 1) {
@@ -415,5 +321,5 @@ Wami.RecordHIT = new function() {
 			}
 		}
 	}
-    }
+}
     
