@@ -51,16 +51,17 @@ Turk.setup = function(validator) {
 
     var bd = new Turk.BrowserDetect();
     var browserInfo = bd.OS + " : " +bd.browser + " " + bd.version;
-    var fp = Wami.swfobject.getFlashPlayerVersion();
-    var flashInfo = "None";
-    if (fp) {
-	var flashInfo = "Flash Player " + fp.major + "." + fp.minor + "." + fp.release;
-    }
 
     Turk.setResultField("platform", browserInfo);
-    Turk.setResultField("flash", flashInfo);
 }
 
+/**
+ * Determine whether the person is just previewing the HIT.
+ * Sometimes, it's useful to put up a message such as "You must ACCEPT
+ * the HIT before performing work", because it's a pain for the
+ * turkers to do the entire thing and then realize they did not accept
+ * the HIT.
+ */
 Turk.isPreview = function() {
     var assignmentId = Turk.gup("assignmentId");
     return assignmentId == "ASSIGNMENT_ID_NOT_AVAILABLE";
@@ -151,6 +152,10 @@ Turk.setResultField = function(name, value) {
     form.appendChild(hiddenE);
 }
 
+/**
+ * Browser detection should only be used for logging purposes.
+ * Turk.setup logs the browser type.
+ */
 Turk.BrowserDetect = function() {
     var dataBrowser = [
 			{

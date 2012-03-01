@@ -26,6 +26,7 @@ Wami.RecordHIT = new function() {
 						embedWami(function() {
 							_prompts = parsePrompts(prompts);
 							setupGUI();
+							logFlashVersion();
 						});
 			                });
 				});
@@ -33,6 +34,15 @@ Wami.RecordHIT = new function() {
 		});
 
 		return _session_id;
+	}
+
+        function logFlashVersion() {
+	    var fp = Wami.swfobject.getFlashPlayerVersion();
+	    var flashInfo = "None";
+	    if (fp) {
+		var flashInfo = "Flash Player " + fp.major + "." + fp.minor + "." + fp.release;
+		Turk.setResultField("flash", flashInfo);
+	    }
 	}
 	    
         function getLatestScript() {
