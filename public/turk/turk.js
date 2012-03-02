@@ -13,7 +13,7 @@ var Turk = window.Turk || {};
  */
 Turk.setup = function(validator) {
     var form = document.getElementById('mturk_form');
-    var assnElem = document.getElementById("assignmentId");
+    var assnElem = document.getElementById('assignmentId');
     var submitButton = document.getElementById('submitButton');
     
     if (document.referrer && ( document.referrer.indexOf('workersandbox') != -1) ) {
@@ -23,14 +23,15 @@ Turk.setup = function(validator) {
     }
 
     var assignmentId = this.gup("assignmentId");
-    if (!assignmentId) {
-	submitButton.disabled = true;
-    } else if (this.isPreview()) {
-	submitButton.disabled = true;
-	submitButton.value = "You must ACCEPT the HIT before you can submit the results.";
-	submitButton.style.width = "400px";
-    } else {
-	assnElem.value = assignmentId;
+    if (assignmentId) {
+	if (this.isPreview()) {
+	    submitButton.disabled = true;
+	    submitButton.value = "You must ACCEPT the HIT before you can submit the results.";
+	    submitButton.style.width = "400px";
+	} else {
+	    submitButton.disabled = false;
+	    assnElem.value = assignmentId;
+	}
     }
 
     if (validator) {
