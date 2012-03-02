@@ -12,18 +12,17 @@ var Turk = window.Turk || {};
  * a HIT is valid.
  */
 Turk.setup = function(validator) {
+    var form = document.getElementById('mturk_form');
     var assnElem = document.getElementById("assignmentId");
     var submitButton = document.getElementById('submitButton');
-
-    var assignmentId = this.gup("assignmentId");
-
+    
     if (document.referrer && ( document.referrer.indexOf('workersandbox') != -1) ) {
-	var form = document.getElementById('mturk_form');
 	form.action = "https://workersandbox.mturk.com/mturk/externalSubmit";
     } else {
 	form.action = "https://www.mturk.com/mturk/externalSubmit";
     }
 
+    var assignmentId = this.gup("assignmentId");
     if (!assignmentId) {
 	submitButton.disabled = true;
     } else if (this.isPreview()) {
