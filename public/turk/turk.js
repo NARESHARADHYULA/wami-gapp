@@ -78,8 +78,23 @@ Turk.gup = function(name) {
     if (!results) {
 	return null;
     } else {
-	return results[1];
+	var p = results[1];
+	p = decodeURIComponent(p.replace(/\+/g, " "));
+	return p;
     }
+}
+
+/**
+ * Split a <> delimited URL param into an array.
+ */
+Turk.gupsplit = function(name) {
+    var p = Turk.gup(name);
+    if (!p) {
+	return null;
+    }
+
+    p = p.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+    return p.split(/<>/);
 }
 
 /**

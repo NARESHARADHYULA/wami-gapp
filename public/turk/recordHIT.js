@@ -205,21 +205,22 @@ Wami.RecordHIT = new function() {
 		return button;
 	}
 	
-	function parsePrompts(prompts) {
+	function parsePrompts(variable) {
 	    var regex = new RegExp("[$][{](.*)[}]");
-	    var results = regex.exec(prompts);
+	    var results = regex.exec(variable);
+
+	    var prompts = null;
 	    if (results) {
-		var p = Turk.gup(results[1]);
-		if (p) {
-		    // prompts comes from URL not AMT var.
-		    p = decodeURIComponent(p.replace(/\+/g, " "));
-		    p = p.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-		    prompts = p;							
-		} else {
-		    prompts = "Example Prompt 1 <> Test Prompt 2 <> Sample Prompt 3";
-		}
+		prompts = Turk.gupsplit(results[1]);
 	    }
-	    return prompts.split(/<>/);
+
+	    if (!prompts) {
+		prompts = ["Example Prompt 1",
+			   "Test Prompt 2",
+			   "Sample Prompt 3"];
+    	    }
+	    
+	    return prompts;
 	}
 
 	function setupPrompts() {
