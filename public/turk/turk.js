@@ -15,11 +15,10 @@ Turk.setup = function(validator) {
     var form = document.getElementById('mturk_form');
     var assnElem = document.getElementById('assignmentId');
     var submitButton = document.getElementById('submitButton');
-    
-    if (document.referrer && ( document.referrer.indexOf('workersandbox') != -1) ) {
-	form.action = "http://workersandbox.mturk.com/mturk/externalSubmit";
-    } else {
-	form.action = "https://www.mturk.com/mturk/externalSubmit";
+
+    var submitTo = Turk.gup("turkSubmitTo");
+    if (submitTo) {
+        form.action = submitTo;
     }
 
     var assignmentId = this.gup("assignmentId");
