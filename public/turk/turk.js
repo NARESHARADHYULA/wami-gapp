@@ -17,7 +17,7 @@ Turk.setup = function(validator) {
     var submitButton = document.getElementById('submitButton');
     
     if (document.referrer && ( document.referrer.indexOf('workersandbox') != -1) ) {
-	form.action = "https://workersandbox.mturk.com/mturk/externalSubmit";
+	form.action = "http://workersandbox.mturk.com/mturk/externalSubmit";
     } else {
 	form.action = "https://www.mturk.com/mturk/externalSubmit";
     }
