@@ -18,7 +18,7 @@ Turk.setup = function(validator) {
 
     var submitTo = Turk.gup("turkSubmitTo");
     if (submitTo) {
-        form.action = submitTo;
+        form.action = submitTo + "/mturk/externalSubmit";
     }
 
     var assignmentId = this.gup("assignmentId");
