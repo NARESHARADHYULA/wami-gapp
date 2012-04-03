@@ -213,6 +213,9 @@ Wami.RecordHIT = new function() {
 	    if (results) {
 		prompts = Turk.gupsplit(results[1]);
 	    }
+	    else {
+		prompts = Turk.gupsplit(variable);
+	    }
 
 	    if (!prompts) {
 		prompts = ["Example Prompt 1",
