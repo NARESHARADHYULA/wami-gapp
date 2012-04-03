@@ -211,10 +211,13 @@ Wami.RecordHIT = new function() {
 
 	    var prompts = null;
 	    if (results) {
-		prompts = Turk.gupsplit(results[1]);
+		var p = Turk.gup(results[1]);
+		if (p) {
+		    prompts = Turk.split(p);
+		}
 	    }
 	    else {
-		prompts = Turk.gupsplit(variable);
+		prompts = Turk.split(variable);
 	    }
 
 	    if (!prompts) {

@@ -91,9 +91,14 @@ Turk.gupsplit = function(name) {
     if (!p) {
 	return null;
     }
+    return Turk.split(p);
+}
 
-    p = p.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-    return p.split(/<>/);
+/**
+ * Split a <> delimited string.
+ */
+Turk.split = function(s) {
+    return s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").split(/<>/);
 }
 
 /**
